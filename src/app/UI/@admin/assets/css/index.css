@@ -1,0 +1,9 @@
+@import './material-dashboard-rtl.css';
+@import './material-dashboard.css';
+@import './material-dashboard.min.css';
+
+.content {
+    margin-top: 70px;
+    padding: 30px 15px;
+    min-height: calc(100vh - 123px);
+}
