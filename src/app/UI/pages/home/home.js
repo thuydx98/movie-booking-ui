@@ -1,7 +1,8 @@
+/* eslint-disable no-script-url */
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component, createRef } from 'react';
 import { Carousel, Button } from 'antd';
 import HomeContent from './homeconent';
-import Footer from '../footer/footer';
 import '../../@css_user/index.sass';
 
 
@@ -30,7 +31,7 @@ export default class Home extends Component {
         return (
             <div className="HomePage">
                 <div id="divADLeftPlotting" class="ad_pic" style={{ display: 'none', top: '323px' }}>
-                    <a target="_blank" href="https://www.lottecinemavn.com/LCHS/Contents/Event/infomation-delivery-event.aspx?EventID=201010000621002"><img src="https://media.lottecinemavn.com/Media/WebAdmin/bf9a618204c343d685490cfec021aced.jpg" width="145" border="0" alt="Banner Chay" /></a>
+                    <a target="_blank" href="https://www.lottecinemavn.com/LCHS/Contents/Event/infomation-delivery-event.aspx?EventID=201010000621002" rel="noreferrer"><img src="https://media.lottecinemavn.com/Media/WebAdmin/bf9a618204c343d685490cfec021aced.jpg" width="145" border="0" alt="Banner Chay" /></a>
                     <a href="javascript:void(0);" class="btn_appicClose" title="Đóng biểu ngữ">
                         <img src="/LCHS/Image/Btn/btn_appicClose.gif" alt="Xóa" />
                     </a>

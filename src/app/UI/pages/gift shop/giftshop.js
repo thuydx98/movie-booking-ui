@@ -1,12 +1,10 @@
-import React, { Component, createRef } from 'react';
+/* eslint-disable no-script-url */
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import React, { Component } from 'react';
 import '../../@css_user/index.sass';
 
 
 export default class GiftShop extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <div className="GiftShop">

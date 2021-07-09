@@ -1,4 +1,6 @@
-import React, { Component, createRef } from 'react';
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable no-script-url */
+import React, { Component } from 'react';
 import { getFilmByNewEst, getFilmByView } from '../../../service/film.service';
 import '../../@css_user/index.sass';
 import * as moment from 'moment';
