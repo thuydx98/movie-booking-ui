@@ -1,20 +1,25 @@
 import { environment } from "../../environments/environment";
 import axios from 'axios';
+import service from ".";
 
-const url = environment.BaseURL;
+const BASE_URL = environment.BaseURL + '/api/auth';
 
-export function SignIn(data) {
-    return axios.post(`${url}/api/auth/sign-in`, data);
+export function SignIn(data) {    
+	return service(BASE_URL, {
+        url: '/sign-in',
+		method: 'POST',
+		data: data,
+	});
 }
 
 export function SignUp(data) {
-    return axios.post(`${url}/api/auth/sign-up`, data);
+    return axios.post(`${BASE_URL}/sign-up`, data);
 }
 
 export function checkCode(data) {
-    return axios.post(`${url}/api/auth/check-activation-code`, data);
+    return axios.post(`${BASE_URL}/check-activation-code`, data);
 }
 
 export function forgetPassword(data) {
-    return axios.post(`${url}/api/auth/forgot-password`, data);
+    return axios.post(`${BASE_URL}/forgot-password`, data);
 }

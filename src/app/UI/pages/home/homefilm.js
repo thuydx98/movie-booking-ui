@@ -1,39 +1,40 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable no-script-url */
 import React, { Component } from 'react';
-import { getFilmByNewEst, getFilmByView } from '../../../service/film.service';
-import '../../@css_user/index.sass';
 import * as moment from 'moment';
+import { SortMovieType } from '../../../constants/movie.const';
+import { getPagingListMovie } from '../../../service/movie.service';
+import '../../@css_user/index.sass';
 
 
 export default class HomeFilm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            filmViews: [],
-            flimNewEst: [],
+            mostViewMovies: [],
+            newestMovies: [],
             isLoadViews: 1,
-            isLoadNewEst: 1,
+            isLoadNewest: 1,
         }
         this.loadViews = this.loadViews.bind(this);
-        this.loadNewEst = this.loadNewEst.bind(this);
+        this.loadNewest = this.loadNewest.bind(this);
     }
 
     componentDidMount() {
-        getFilmByNewEst(1, 10).then(res => {
+        getPagingListMovie(1, 10, SortMovieType.Newest).then(data => {
             this.setState({
-                filmViews: res && res.data && res.data.items ? res.data.items : [],
+                mostViewMovies: data?.items || [],
             })
         });
 
-        getFilmByView(1, 10).then(res => {
+        getPagingListMovie(1, 10, SortMovieType.View).then(data => {
             this.setState({
-                flimNewEst: res && res.data && res.data.items ? res.data.items : [],
+                newestMovies: data?.items || [],
             })
         });
     }
 
-    formartDate(date) {
+    formatDate(date) {
         return moment(date).format('MM/DD/YYYY');
     }
 
@@ -41,9 +42,9 @@ export default class HomeFilm extends Component {
         this.setState({isLoadViews: 2});
     }
 
-    loadNewEst() {
+    loadNewest() {
         this.setState({
-            flimNewEst: [...this.state.flimNewEst, this.state.flimNewEst]
+            newestMovies: [...this.state.newestMovies, this.state.newestMovies]
         });
     }
 
@@ -60,7 +61,7 @@ export default class HomeFilm extends Component {
                             <h3 class="cinema_stit pt30">Mới công chiếu</h3>
                             <ul class="curr_list movie_clist" id="ulMovieList">
                                 {
-                                    this.state.flimNewEst.map((value, index) => {
+                                    this.state.newestMovies.map((value, index) => {
                                         return <li class="">
                                             <div class="curr_box">
                                                 <span class="num">{index}</span>
@@ -72,7 +73,7 @@ export default class HomeFilm extends Component {
                                                 </span>
                                             </div>
                                             <div class="layer_hover">
-                                                <a href="javascript:void(0)" onclick="goToTiketing('10714');" class="btn_reserve">Đặt vé</a>
+                                                <a href="javascript:void(0)" onclick="goToTicket('10714');" class="btn_reserve">Đặt vé</a>
                                                 <a href="javascript:void(0)" onclick="goToMovie('10714');" class="btn_View">Chi tiết</a>
                                             </div>
                                             <dl class="list_text">
@@ -81,8 +82,8 @@ export default class HomeFilm extends Component {
                                                         <span class="grade_18">청불</span>{value.name}</a>
                                                 </dt>
                                                 <dd>
-                                                    <span class="rate">{value.duration}Phút</span>
-                                                    <span class="grade"><em>{this.formartDate(value.publishAt)}</em>
+                                                    <span class="rate">{value.duration} Phút</span>
+                                                    <span class="grade"><em>{this.formatDate(value.publishAt)}</em>
                                                     </span>
                                                 </dd>
                                             </dl>
@@ -90,15 +91,14 @@ export default class HomeFilm extends Component {
                                     })
                                 }
                             </ul>
-                            <a onClick={this.loadNewEst} href="javascript:void(0);" className="btn_view" id="aMore2" style={{ display: 'block' }}>
+                            <a onClick={this.loadNewest} href="javascript:void(0);" className="btn_view" id="aMore2" style={{ display: 'block' }}>
                                 <span class="Lang-LBL0000">Thêm</span>
                             </a>
 
-                            {/* //////////// */}
                             <h3 class="cinema_stit pt30">Được xem nhiều nhất</h3>
                             <ul class="curr_list movie_clist" id="ulMovieList">
                                 {
-                                    this.state.filmViews.map((value, index) => {
+                                    this.state.mostViewMovies.map((value, index) => {
                                         return <li class="">
                                             <div class="curr_box">
                                                 <span class="num">{index}</span>
@@ -110,7 +110,7 @@ export default class HomeFilm extends Component {
                                                 </span>
                                             </div>
                                             <div class="layer_hover">
-                                                <a href="javascript:void(0)" onclick="goToTiketing('10714');" class="btn_reserve">Đặt vé</a>
+                                                <a href="javascript:void(0)" onclick="goToTicket('10714');" class="btn_reserve">Đặt vé</a>
                                                 <a href="javascript:void(0)" onclick="goToMovie('10714');" class="btn_View">Chi tiết</a>
                                             </div>
                                             <dl class="list_text">
@@ -119,8 +119,8 @@ export default class HomeFilm extends Component {
                                                         <span class="grade_18">청불</span>{value.name}</a>
                                                 </dt>
                                                 <dd>
-                                                    <span class="rate">{value.duration}Phút</span>
-                                                    <span class="grade"><em>{this.formartDate(value.publishAt)}</em>
+                                                    <span class="rate">{value.duration} Phút</span>
+                                                    <span class="grade"><em>{this.formatDate(value.publishAt)}</em>
                                                     </span>
                                                 </dd>
                                             </dl>

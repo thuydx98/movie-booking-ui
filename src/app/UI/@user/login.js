@@ -3,11 +3,11 @@
 /* eslint-disable react/jsx-no-target-blank */
 import React, { Component } from 'react';
 import { Link, Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { Button, message as toastr, Space } from 'antd';
 import { actUpdateStateUserLoginRequest } from '../../actions/actions';
 import { SignIn } from '../../service/auth.service';
 import './css/login.sass';
-import { connect } from 'react-redux';
-import { message as toastr } from 'antd';
 
 class Login extends Component {
 	constructor(props) {
@@ -16,6 +16,7 @@ class Login extends Component {
 			username: '',
 			password: '',
 			redirectToReferrer: '',
+			loading: false,
 		};
 		this.login = this.login.bind(this);
 		this.onChange = this.onChange.bind(this);
@@ -23,47 +24,40 @@ class Login extends Component {
 
 	login() {
 		if (this.state.username && this.state.password) {
-			console.log(this.state.username + '-' + this.state.password);
+			const { username: email, password } = this.state;
+			this.setState({ loading: true });
 
-			var model = {
-				email: this.state.username,
-				password: this.state.password,
-			};
-
-			SignIn(model)
+			SignIn({ email, password })
 				.then((res) => {
-					if (res && res.data) {
-						if (res.data) {
-							localStorage.setItem('user', JSON.stringify(res.data));
-						}
+					if (res) {
+						localStorage.setItem('user', JSON.stringify(res));
+					}
 
-						if (res.data.token) {
-							localStorage.setItem('access_token', res.data.token);
-						}
+					if (res.token) {
+						localStorage.setItem('access_token', res.token);
+					}
 
-						toastr.error('Đăng nhập thành công.');
+					this.setState({ loading: false });
+					toastr.success('Đăng nhập thành công.');
 
-						if (res.data.role === 'admin') {
-							this.updateUserLogin();
-							this.setState({ redirectToReferrer: 'admin' });
-						}
+					if (res.role === 'admin') {
+						this.updateUserLogin();
+						this.setState({ redirectToReferrer: 'admin' });
+					}
 
-						if (res.data.role === 'user') {
-							this.updateUserLogin();
-							this.setState({ redirectToReferrer: 'user' });
-						}
+					if (res.role === 'user') {
+						this.updateUserLogin();
+						this.setState({ redirectToReferrer: 'user' });
 					}
 				})
 				.catch((error) => {
-					console.log(error);
-					var message = 'Đăng nhập thất bại.';
-					if (error && error.response && error.response.data && error.response.data.message) {
-						message = error.response.data.message;
-						if (message === 'user-not-exist') {
-							message = 'Tài khoản không tồn tại.';
-						}
+					let message = 'Đăng nhập thất bại.';
+					if (error?.message === 'user-not-exist') {
+						message = 'Tài khoản không tồn tại.';
 					}
+
 					toastr.error(message);
+					this.setState({ loading: false });
 				});
 		}
 	}
@@ -81,14 +75,11 @@ class Login extends Component {
 
 	render() {
 		if (this.state.redirectToReferrer === 'admin') {
-			return <Redirect to={'/admin/dashborad'} />;
+			return <Redirect to={'/admin/dashboard'} />;
 		}
 		if (this.state.redirectToReferrer === 'user') {
 			return <Redirect to={'/'} />;
 		}
-		// if (localStorage.getItem('userData')) {
-		//     return (<Redirect to={'/'} />)
-		// }
 
 		return (
 			<div className="LoginPage">
@@ -110,28 +101,25 @@ class Login extends Component {
 															<label for="userId" class="Lang-LBL0121">
 																ID
 															</label>
-															<input onChange={this.onChange} type="text" id="userId" name="username" maxlength="50" placeholder="Vui lòng nhập địa chỉ Email" />
+															<input onChange={this.onChange} type="text" id="userId" name="username" placeholder="Vui lòng nhập địa chỉ Email" />
 														</span>
 														<span>
 															<label for="userPassword" class="Lang-LBL0085">
 																Mật khẩu
 															</label>
-															<input onChange={this.onChange} type="password" id="userPassword" name="password" maxlength="20" placeholder="Vui lòng nhập mật khẩu" />
+															<input onChange={this.onChange} type="password" id="userPassword" name="password" placeholder="Vui lòng nhập mật khẩu" />
 														</span>
 													</div>
 													<div class="login_find">
 														<span>
 															<label for="saveId" class="Lang-LBL5024"></label>
 														</span>
-														<input onClick={this.login} type="button" class="btn_login Lang-LBL0005" value="Đăng nhập" id="btnMember" style={{ cursor: 'pointer' }} title="login" />
-														<Link to="/forget-pasword">
-															<span>
-																<input type="checkbox" id="saveId" name="saveId" value="Y" style={{ marginRight: '4px' }} />
-																<a href="javascript:void(0);" target="_blank" title="Tìm mật khẩu Đã mở cửa sổ mới" id="aFindPassword" class="Lang-LBL5026">
-																	Tìm mật khẩu
-																</a>
-															</span>
-														</Link>
+														<Space>
+															<Button type="button" loading={this.state.loading} onClick={this.login}>
+																Đăng nhập
+															</Button>
+															<Link to="/forget-password">Quên mật khẩu</Link>
+														</Space>
 													</div>
 												</div>
 											</div>
