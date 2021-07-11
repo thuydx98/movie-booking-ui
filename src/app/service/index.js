@@ -13,7 +13,7 @@ const request = (baseURL, options) => {
 	const client = createClient(baseURL);
 
 	return client(options)
-		.then((response) => response.data)
+		.then((response) => response?.data)
 		.catch((error) => Promise.reject(error?.response?.data || error.message));
 };
 

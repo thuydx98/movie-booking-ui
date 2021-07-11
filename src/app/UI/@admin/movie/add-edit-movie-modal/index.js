@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { Modal, Form, Input, Button, Upload, InputNumber, DatePicker } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import * as movieService from '../../../../service/movie.service';
-import moment from 'moment';
 import { message as toastr } from 'antd';
 import { environment } from '../../../../../environments/environment';
 
@@ -27,32 +26,24 @@ export default class AddEditMovieModal extends Component {
 	}
 
 	handleOk() {
-		this.formRef.current.validateFields();
+		this.formRef.current.validateFields().then((movie) => {
+			movieService
+				.createMovie(movie)
+				.then((response) => {
+					toastr.success(`${movie.id ? 'Sửa' : 'Thêm'} phim thành công`);
+					this.props.onCloseModal(response);
+					this.formRef.current.resetFields();
+				})
+				.catch(() => {
+					toastr.error(`${movie.id ? 'Sửa' : 'Thêm'} phim thất bại`);
+				});
+		});
 	}
 
 	render() {
-		const normFile = (e) => {
-			console.log('Upload event:', e);
-			if (Array.isArray(e)) {
-				return e;
-			}
-			return e && e.fileList;
-		};
-
-		const formItemLayout = {
-			labelCol: {
-				xs: { span: 24 },
-				sm: { span: 7 },
-			},
-			wrapperCol: {
-				xs: { span: 24 },
-				sm: { span: 17 },
-			},
-		};
-
 		return (
 			<Modal cancelText="Hủy" okText={!this.state.movie.id ? 'Tạo' : 'Lưu'} title={!this.state.movie.id ? 'Thêm phim' : 'Sửa phim'} visible={this.props.visible} onOk={this.handleOk} onCancel={this.props.onCloseModal}>
-				<Form ref={this.formRef} onFinish={this.onFinish} {...formItemLayout}>
+				<Form ref={this.formRef} onFinish={this.onFinish} initialValues={this.state.movie} {...formItemLayout}>
 					<Form.Item
 						name="name"
 						label="Tên phim"
@@ -104,8 +95,7 @@ export default class AddEditMovieModal extends Component {
 					<Form.Item
 						name="posterUrl"
 						label="Poster"
-						valuePropName="fileList"
-						getValueFromEvent={normFile}
+						getValueFromEvent={(e) => e.fileList[0]?.response || e}
 						rules={[
 							{
 								required: true,
@@ -113,7 +103,7 @@ export default class AddEditMovieModal extends Component {
 							},
 						]}
 					>
-						<Upload name="poster" action={environment.BaseURL + '/files/posters'} accept="image/*" listType="picture">
+						<Upload name="poster" action={environment.BaseURL + '/files/posters'} multiple="false" maxCount={1} accept="image/*" listType="picture">
 							<Button icon={<UploadOutlined />}>Click to upload</Button>
 						</Upload>
 					</Form.Item>
@@ -122,3 +112,14 @@ export default class AddEditMovieModal extends Component {
 		);
 	}
 }
+
+const formItemLayout = {
+	labelCol: {
+		xs: { span: 24 },
+		sm: { span: 7 },
+	},
+	wrapperCol: {
+		xs: { span: 24 },
+		sm: { span: 17 },
+	},
+};

@@ -12,7 +12,7 @@ export default class Movie extends Component {
 		super(props);
 		this.state = {
 			page: 1,
-			size: 10,
+			size: 5,
 			total: 0,
 			items: [],
 			loading: true,
@@ -47,7 +47,7 @@ export default class Movie extends Component {
 			icon: <ExclamationCircleOutlined />,
 			okType: 'danger',
 			content: 'When delete this movie, all booking history will be delete together.',
-			onOk() {
+			onOk: () => {
 				return new Promise((resolve, reject) => {
 					movieService
 						.deleteMovie(movieId)
@@ -57,7 +57,7 @@ export default class Movie extends Component {
 							this.setState({ items });
 							toastr.success('Xóa phim thành công');
 						})
-						.catch(() => {
+						.catch((err) => {
 							reject();
 							toastr.error('Xóa phim thất bại');
 						});
@@ -71,7 +71,8 @@ export default class Movie extends Component {
 	}
 
 	onCloseModal(movie) {
-		if (movie) {
+		if (movie.id) {
+			this.setState({ items: [movie, ...this.state.items] });
 		}
 
 		this.setState({ modalVisible: false });

@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import './assets/css/index.css';
 import './assets/img/apple-icon.png';
 import HeaderAdmin from './header';
-import Footer from './footer';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import Dashboard from './dashboard';
 import Movie from './movie';
+import Cinema from './cinema';
 
 export default class Admin extends Component {
 	render() {
@@ -27,12 +27,12 @@ export default class Admin extends Component {
 								<Switch>
 									<Route path="/admin/dashboard" component={Dashboard} />
 									<Route path="/admin/movies" component={Movie} />
+									<Route path="/admin/cinemas" component={Cinema} />
 								</Switch>
 							</div>
 						</div>
 					</div>
 				</div>
-				<Footer />
 			</div>
 		);
 	}
