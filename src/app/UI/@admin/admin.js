@@ -6,6 +6,7 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import Dashboard from './dashboard';
 import Movie from './movie';
 import Cinema from './cinema';
+import ShowTime from './show-time';
 
 export default class Admin extends Component {
 	render() {
@@ -28,6 +29,7 @@ export default class Admin extends Component {
 									<Route path="/admin/dashboard" component={Dashboard} />
 									<Route path="/admin/movies" component={Movie} />
 									<Route path="/admin/cinemas" component={Cinema} />
+									<Route path="/admin/show-times" component={ShowTime} />
 								</Switch>
 							</div>
 						</div>

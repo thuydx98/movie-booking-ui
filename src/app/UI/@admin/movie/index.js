@@ -131,7 +131,7 @@ export default class Movie extends Component {
 				title: 'Action',
 				key: 'action',
 				render: (_, item) => (
-					<Button type="link" size="small" onClick={() => this.onDelete(item.id)}>
+					<Button danger type="link" size="small" onClick={() => this.onDelete(item.id)}>
 						Delete
 					</Button>
 				),
