@@ -105,16 +105,13 @@ class Header extends Component {
 
 							<li>
 								<a href="" id="topMembership" title="Thẻ thành viên">
-									Thẻ thành viên
+									Lịch sử đặt vé
 								</a>
 							</li>
 							<li>
 								<a href="" id="topCustomerService" title="Hỗ trợ khách hàng">
 									Hỗ trợ khách hàng
 								</a>
-							</li>
-							<li class="lang">
-								<a href="javascript:void(0);" id="LanguageSetting" class="btn_english"></a>
 							</li>
 						</ul>
 					</div>

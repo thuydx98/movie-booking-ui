@@ -30,6 +30,7 @@ export default class Admin extends Component {
 									<Route path="/admin/movies" component={Movie} />
 									<Route path="/admin/cinemas" component={Cinema} />
 									<Route path="/admin/show-times" component={ShowTime} />
+									<Redirect to="/admin/dashboard" />
 								</Switch>
 							</div>
 						</div>

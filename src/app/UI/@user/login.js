@@ -75,7 +75,7 @@ class Login extends Component {
 
 	render() {
 		if (this.state.redirectToReferrer === 'admin') {
-			return <Redirect to={'/admin/dashboard'} />;
+			return <Redirect to={'/admin'} />;
 		}
 		if (this.state.redirectToReferrer === 'user') {
 			return <Redirect to={'/'} />;
