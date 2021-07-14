@@ -104,9 +104,9 @@ class Header extends Component {
 							</li>
 
 							<li>
-								<a href="" id="topMembership" title="Thẻ thành viên">
+								<Link to="/booking-histories" id="topMembership">
 									Lịch sử đặt vé
-								</a>
+								</Link>
 							</li>
 							<li>
 								<a href="" id="topCustomerService" title="Hỗ trợ khách hàng">

@@ -11,6 +11,7 @@ import Resgister from '../app/UI/@user/resgister';
 import Profile from '../app/UI/@user/profile';
 import Header from '../app/UI/pages/header/header';
 import Footer from '../app/UI/pages/footer/footer';
+import BookingHistory from '../app/UI/pages/booking-history';
 import CodeVerification from '../app/UI/@user/codeverification';
 import ForgetPassword from '../app/UI/@user/forgetPasword';
 import Admin from '../app/UI/@admin/admin';
@@ -36,6 +37,7 @@ export default class RouterURL extends Component {
 							<Route path="/cinema" component={Cinema} />
 							<Route path="/promotion" component={Promotion} />
 							<Route path="/profile" component={Profile} />
+							<Route path="/booking-histories" component={BookingHistory} />
 						</Switch>
 						<Footer />
 					</div>
