@@ -24,6 +24,8 @@ before_install:
   # import heroku CLI
   # add heroku auth:token to TravisCI Environment Variables (https://travis-ci.org/github/thuydx98/human-resource-management/settings)
   - echo 'PATH="/usr/local/heroku/bin:$PATH"' >> ~/.profile
+  - sudo apt-get update
+  - sudo apt-get install python3
 
 script:
   - docker build -f Dockerfile -t hcmus-movie .
