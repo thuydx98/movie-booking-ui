@@ -6,8 +6,8 @@ COPY package.json ./
 COPY package-lock.json ./
 RUN npm install react-scripts@3.4.1 -g --silent
 COPY . ./
-RUN npm i
-RUN npm run build
+RUN sudo apt-get update && sudo apt-get install python3
+RUN npm install && npm rebuild node-sass && npm run build
 
 # production environment
 FROM nginx:stable-alpine
