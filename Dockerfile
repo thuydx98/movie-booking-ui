@@ -1,13 +1,13 @@
 # build environment
-FROM node:13.12.0-alpine as build
+FROM node:8.12-alpine as build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY package-lock.json ./
-RUN apt-get update && apt-get install python3
+RUN RUN apk add g++ make python
 RUN npm install react-scripts@3.4.1 -g --silent
 COPY . ./
-RUN npm install && npm rebuild node-sass && npm run build
+RUN npm install && npm run build
 
 # production environment
 FROM nginx:stable-alpine
