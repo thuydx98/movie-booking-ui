@@ -4,9 +4,9 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY package-lock.json ./
+RUN apt-get update && apt-get install python3
 RUN npm install react-scripts@3.4.1 -g --silent
 COPY . ./
-RUN sudo apt-get update && sudo apt-get install python3
 RUN npm install && npm rebuild node-sass && npm run build
 
 # production environment
