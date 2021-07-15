@@ -4,7 +4,7 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY package-lock.json ./
-RUN RUN apk add g++ make python
+RUN apk add g++ make python
 RUN npm install react-scripts@3.4.1 -g --silent
 COPY . ./
 RUN npm install && npm run build
