@@ -1,4 +1,4 @@
 export const environment = {
-    BaseURL: process.env.API_URL || 'http://localhost:8888',
+    BaseURL: 'https://hcmus-movie-api.herokuapp.com',
     Host: 'https://localhost:3000'
 };
