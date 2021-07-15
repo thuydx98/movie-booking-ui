@@ -6,6 +6,7 @@ COPY package.json ./
 COPY package-lock.json ./
 RUN npm install react-scripts@3.4.1 -g --silent
 COPY . ./
+RUN npm i
 RUN npm run build
 
 # production environment
