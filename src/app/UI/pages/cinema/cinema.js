@@ -1,121 +1,129 @@
-/* eslint-disable no-script-url */
-/* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { Component, createRef } from 'react';
+import React, { Component } from 'react';
+import moment from 'moment';
+import { Link } from 'react-router-dom';
+import { PageHeader, DatePicker, Descriptions, Empty, Skeleton } from 'antd';
+import * as branchService from '../../../service/branch.service';
+import * as showTimeService from '../../../service/show-time.service';
 import '../../css/cemina.sass';
 
-
 export default class Cinema extends Component {
-    constructor(props) {
-        super(props);
-        this.carousel = createRef();
-    }
+	constructor(props) {
+		super(props);
+		this.state = {
+			loading: true,
+			branch: undefined,
+			showTimes: [],
+			selectedDate: moment(),
+		};
 
-    render() {
-        return (
-            <div className="CinemaPage">
-                <div class="cont_cinema" id="a_cont_cinema">
-                    <div class="cont_cinema_Area">
-                        <div class="m_theader">
-                            <div class="m_inner_new">
-                                <div class="clear_fix">
-                                    <div class="fl">
-                                        <h2 class="sub_tit" id="cinemaName1">Việt Trì</h2>
-                                        <ul class="m_etc">
-                                            <li>
-                                                <a href="javascript:void(0);" class="btn_moive on" id="aFavorCinemaOpen" title="Xem thông tin chi tiết"><em>Thêm rạp vào My Cinema</em><span>Mở</span></a>
-                                            </li>
-                                            <li><a href="javascript:void(0);" class="btn_fee" id="aFeeGuideOpen" title="Xem thông tin chi tiết">Bảng Giá Vé</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <p class="sub_txt2" id="cinemaIntroduction"></p>
-                                <p class="sub_addr2" id="spanAddress">Tầng 5, TTTM Vincom Việt Trì, P.Tiên Cát, TP.Việt Trì, T.Phú Thọ, Việt Nam<br />
-                                    <span class="p_theater">Tổng số phòng chiếu <em id="emTotalScreenCount">4</em> phòng</span>
-                                    <span class="p_seat">Tổng số chỗ ngồi <em id="emTotalSeatCount">631</em> ghế</span>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="c_fixed">
-                            <div class="bg_fixed" style={{position: 'relative', top: '0px'}}>
-                                <ul class="tab_st07" id="ulSubTap">
-                                    <li class="on"><a href="#a_cont_cinema" onclick="setSelectedNavi(this);">Lịch chiếu phim</a></li>
-                                    <li><a href="#a_map_cont" onclick="setSelectedNavi(this);">Vị trí của rạp</a></li>
-                                    <li><a href="#a_transport" onclick="setSelectedNavi(this);">Hướng dẫn đi tới rạp</a></li>
-                                    <li><a href="#a_moreinfo" onclick="setSelectedNavi(this);">Tiện ích đi kèm</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        {/* Lich */}
-                        <div class="calendar">
+		this.onFindShowTime = this.onFindShowTime.bind(this);
+		this.onFindBranch = this.onFindBranch.bind(this);
+	}
 
-                        </div>
-                        <ul class="cinema_grad">
-                            <li><span class="grade_all">All</span> Mọi đối tượng</li>
-                            <li><span class="grade_13">13</span> 13 tuổi trở lên</li>
-                            <li><span class="grade_16">16</span> 16 tuổi trở lên</li>
-                            <li><span class="grade_18">18</span> 18 tuổi trở lên</li>
-                        </ul>
+	componentDidMount() {
+		const branchId = this.props.match.params.id;
+		this.onFindBranch(branchId);
+	}
 
+	componentWillReceiveProps(newProps) {
+		const branchId = newProps.match.params.id;
+		if (+branchId !== this.state.branch.id) {
+			this.onFindBranch(branchId);
+		}
+	}
 
+	onFindBranch(branchId) {
+		branchService.getOne(branchId).then((branch) => {
+			this.setState({ branch });
+		});
 
-                        <div class="time_inner">
-                            <div class="time_noData" style={{display: 'none'}}>
-                                <span class="noData">Kính mời quý khách chọn phim để xem lịch chiếu chi tiết tại rạp</span>
-                            </div>
-                            <div class="time_box time_list02">
-                                <div class="time_aType time8021">
-                                    <dl class="time_line movie10656">
-                                        <dt>
-                                            <span class="grade_13">전체</span>BỐ GIÀ <a href="javascript:void(0)" class="btn_detail" title="Xem thông tin chi tiết phim"><img src="https://www.lottecinemavn.com/LCHS/Image/Btn/btn_time_view.png" alt="Chi tiết phòng hát" /></a>
-                                        </dt>
-                                        <dd class="screen20050100100100 film200">
-                                            <ul class="cineD1">
-                                                <li>2D</li>
-                                                <li>Lồng tiếng</li>
-                                            </ul>
-                                            <ul class="theater_time list10656" screendiv="100">
-                                                <li>
-                                                    <a href="javascript:void(0);" class="time_active t1">
-                                                        <span class="cineD2 brand"><em>Screen01</em></span><span class="clock">20:00<span> ~ 22:28</span></span>
-                                                        <span class="ppNum"><em class="color_brown" title="Kiểm tra chỗ ngồi của bạn">138</em> / 182 Ghế ngồi</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </dd>
-                                    </dl>
-                                    <dl class="time_line movie10686">
-                                        <dt>
-                                            <span class="grade_18">청불</span>SIÊU TRỘM <a href="javascript:void(0)" class="btn_detail" title="Xem thông tin chi tiết phim"><img src="https://www.lottecinemavn.com/LCHS/Image/Btn/btn_time_view.png" alt="Chi tiết phòng hát" /></a>
-                                        </dt>
-                                        <dd class="screen200100100100100 film200">
-                                            <ul class="cineD1">
-                                                <li>2D</li>
-                                                <li>Phụ đề</li>
-                                            </ul>
-                                            <ul class="theater_time list10686" screendiv="100">
-                                                <li>
-                                                    <a href="javascript:void(0);" class="time_active t0">
-                                                        <span class="cineD2 brand"><em>Screen02</em></span><span class="clock">19:45<span> ~ 22:03</span></span>
-                                                        <span class="ppNum"><em class="color_brown" title="Kiểm tra chỗ ngồi của bạn">88</em> / 124 Ghế ngồi</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </dd>
-                                    </dl>
-                                </div>
-                            </div>
-                        </div>
+		const { selectedDate } = this.state;
+		this.onFindShowTime(branchId, selectedDate);
+	}
 
+	onFindShowTime(branchId, date) {
+		this.setState({ selectedDate: date, loading: true });
 
+		const startTime = date.startOf('day').format('YYYY-MM-DDTHH:mm:ss');
+		const endTime = date.endOf('day').format('YYYY-MM-DDTHH:mm:ss');
+		const params = { branchId, startTime, endTime };
+		showTimeService.get(params).then((showTimes) => {
+			this.setState({ showTimes, loading: false });
+		});
+	}
 
+	render() {
+		const { loading, showTimes, branch, selectedDate } = this.state;
+		const movies = [...new Map(showTimes.map((item) => item.movie).map((item) => [item.id, item])).values()];
+		return (
+			<div className="CinemaPage">
+				<div class="cont_cinema" id="a_cont_cinema">
+					<div class="cont_cinema_Area">
+						{branch && (
+							<PageHeader
+								className="site-page-header"
+								title={branch?.name}
+								extra={[<DatePicker disabledDate={(d) => !d || d.isBefore(moment())} allowClear={false} defaultValue={selectedDate} onChange={(date) => this.onFindShowTime(branch?.id, date)} />]}
+							>
+								<Descriptions size="small" column={2}>
+									<Descriptions.Item label="Số phòng chiếu">{branch?.cinemas.length + ' phòng'}</Descriptions.Item>
+									<Descriptions.Item label="Sức chứa">{branch?.cinemas.reduce((a, b) => a + b.horizontalSize * b.verticalSize, 0) + ' ghế'}</Descriptions.Item>
+									<Descriptions.Item label="Loại phòng">{[...new Set(branch?.cinemas.map((item) => item.type))].join(', ')}</Descriptions.Item>
+									<Descriptions.Item label="Địa chỉ">{branch?.address}</Descriptions.Item>
+								</Descriptions>
+							</PageHeader>
+						)}
 
-                        <ul class="supInfo">
-                            <li>Lịch chiếu phim có thể thay đổi mà không báo trước</li>
-                            <li>Thời gian bắt đầu chiếu phim có thể chênh lệch 15 phút do chiếu quảng cáo, giới thiệu phim ra rạp</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+						<div class="time_inner pt-0">
+							<div class="time_box time_list02">
+								<div class="time_aType time8021">
+									{movies.map((movie) => {
+										const movieShowTimes = showTimes.filter((st) => st.movie.id === movie.id);
+										return (
+											<dl key={movie.id} class="time_line movie10656">
+												<dt>
+													<span class={movie.age >= 18 ? 'grade_18' : 'grade_13'}></span>
+													{movie.name}
+												</dt>
+												<dd class="screen20050100100100 film200">
+													{movieShowTimes.map((st) => {
+														const disabled = moment(st.startAt).isSameOrBefore(moment());
+														return (
+															<ul class="theater_time list10656" screendiv="100">
+																<li>
+																	<Link to={disabled ? '#' : '/buy-ticket?showTimeId=' + st.id} disabled={disabled} class="time_active t1">
+																		<span class="cineD2 brand">
+																			<em>{st.cinema.name}</em>
+																		</span>
+																		<span class="clock">{moment(st.startAt).format('HH:mm')}</span>
+																		<span class="ppNum">
+																			<em class="color_brown" title="Kiểm tra chỗ ngồi của bạn">
+																				{st.bookings.reduce((a, b) => a + b.tickets.length, 0)}
+																			</em>{' '}
+																			/ {st.cinema.horizontalSize * st.cinema.verticalSize} Ghế ngồi
+																		</span>
+																	</Link>
+																</li>
+															</ul>
+														);
+													})}
+												</dd>
+											</dl>
+										);
+									})}
+									{loading && <Skeleton active className="p-4" />}
+									{!loading && showTimes.length === 0 && <Empty className="py-3" description="Hiện không có suất chiếu nào trong thời gian bạn chọn" />}
+								</div>
+							</div>
+						</div>
+
+						<ul class="supInfo">
+							<li>Lịch chiếu phim có thể thay đổi mà không báo trước</li>
+							<li>Thời gian bắt đầu chiếu phim có thể chênh lệch 15 phút do chiếu quảng cáo, giới thiệu phim ra rạp</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		);
+	}
 }

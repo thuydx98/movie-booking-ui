@@ -26,11 +26,12 @@ export default class ForgetPassword extends Component {
 				.then((res) => {
 					toastr.success('Mã code đã được gửi về gmail.');
 					sessionStorage.setItem('type', 'forgetpassword');
+					sessionStorage.setItem('gmail', model.email);
 					this.setState({ redirectToReferrer: true });
 				})
 				.catch((error) => {
 					console.log(error);
-					toastr.error('Thất bại.');
+					toastr.error('Tài khaonr không tồn tại.');
 				});
 		}
 	}

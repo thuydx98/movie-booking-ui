@@ -53,7 +53,7 @@ class Login extends Component {
 				.catch((error) => {
 					let message = 'Đăng nhập thất bại.';
 					if (error?.message === 'user-not-exist') {
-						message = 'Tài khoản không tồn tại.';
+						message = 'Tài khoản hoặc mật khẩu không đúng.';
 					}
 
 					toastr.error(message);
@@ -99,7 +99,7 @@ class Login extends Component {
 													<div class="login_box">
 														<span>
 															<label for="userId" class="Lang-LBL0121">
-																ID
+																Email
 															</label>
 															<input onChange={this.onChange} type="text" id="userId" name="username" placeholder="Vui lòng nhập địa chỉ Email" />
 														</span>

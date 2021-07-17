@@ -28,7 +28,7 @@ export default class AddEditMovieModal extends Component {
 	handleOk() {
 		this.formRef.current.validateFields().then((movie) => {
 			movieService
-				.createMovie(movie)
+				.createMovie({...movie, publishAt: movie.publishAt.startOf('day')})
 				.then((response) => {
 					toastr.success(`${movie.id ? 'Sửa' : 'Thêm'} phim thành công`);
 					this.props.onCloseModal(response);

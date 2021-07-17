@@ -34,7 +34,7 @@ export default class RouterURL extends Component {
 							<Route path="/gift-shop" component={GiftShop} />
 							<Route path="/film" component={HomeFilm} />
 							<Route path="/buy-ticket" component={BuyTicket} />
-							<Route path="/cinema" component={Cinema} />
+							<Route path="/cinema/:id" component={Cinema} />
 							<Route path="/promotion" component={Promotion} />
 							<Route path="/profile" component={Profile} />
 							<Route path="/booking-histories" component={BookingHistory} />

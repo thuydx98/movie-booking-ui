@@ -3,8 +3,12 @@ import { DatePicker, Empty, Radio, Space, Modal, message, Tooltip, Button } from
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Redirect } from 'react-router-dom';
 import moment from 'moment';
+import qs from 'qs';
 import * as showTimeService from '../../../service/show-time.service';
 import * as bookingService from '../../../service/booking.service';
+import * as movieService from '../../../service/movie.service';
+import * as branchService from '../../../service/branch.service';
+import { SortMovieType } from '../../../constants/movie.const';
 import '../../css/buyticket.sass';
 
 export default class BuyTicket extends Component {
@@ -13,6 +17,8 @@ export default class BuyTicket extends Component {
 		this.state = {
 			data: [],
 			date: moment(),
+			movies: [],
+			branches: [],
 			selectedMovieId: undefined,
 			selectedBranchId: undefined,
 			selectedShowTimeId: undefined,
@@ -21,7 +27,6 @@ export default class BuyTicket extends Component {
 		};
 
 		this.handleOk = this.handleOk.bind(this);
-		this.getData = this.getData.bind(this);
 		this.onChangeDate = this.onChangeDate.bind(this);
 		this.onChangeMovie = this.onChangeMovie.bind(this);
 		this.onChangeBranch = this.onChangeBranch.bind(this);
@@ -30,24 +35,42 @@ export default class BuyTicket extends Component {
 	}
 
 	componentDidMount() {
-		this.getData(this.state.date);
-	}
+		const queries = qs.parse(this.props.location.search, { ignoreQueryPrefix: true });
+		const { movieId, showTimeId } = queries;
 
-	getData(date) {
-		const params = {
-			startTime: date.format(date.isSame(moment(), 'day') ? 'YYYY-MM-DDTHH:mm:ss' : 'YYYY-MM-DD'),
-			endTime: date.format('YYYY-MM-DD'),
-		};
+		const now = moment().format('YYYY-MM-DDTHH:mm:ss');
+		const params = { startTime: now };
 
 		this.setState({ data: [], loading: true });
+
+		movieService.getPagingListMovie(1, 100, SortMovieType.Name, now).then((data) => {
+			const { selectedMovieId } = this.state;
+			this.setState({
+				movies: data?.items || [],
+				selectedMovieId: +movieId || selectedMovieId || data?.items[0]?.id,
+			});
+		});
+
+		branchService.get().then((branches) => {
+			this.setState({ branches });
+		});
+
 		showTimeService.get(params).then((data) => {
 			this.setState({ data, loading: false });
+			if (showTimeId) {
+				const showTime = data.find((item) => item.id === +showTimeId);
+				this.setState({
+					selectedMovieId: showTime.movie.id,
+					date: moment(showTime.startAt).startOf('day'),
+					selectedBranchId: showTime.cinema.branch.id,
+					selectedShowTimeId: showTime.id,
+				});
+			}
 		});
 	}
 
 	onChangeDate(date) {
-		this.setState({ date, selectedMovieId: undefined, selectedBranchId: undefined, selectedShowTimeId: undefined, selectedSeats: [] });
-		this.getData(date);
+		this.setState({ date, selectedBranchId: undefined, selectedShowTimeId: undefined, selectedSeats: [] });
 	}
 
 	onChangeMovie(event) {
@@ -104,12 +127,16 @@ export default class BuyTicket extends Component {
 				});
 			},
 		});
-	};
+	}
 
 	renderSeatContainer(showTime) {
 		const result = [];
 		for (let i = 0; i < showTime?.cinema.verticalSize; i++) {
-			result.push(<Space className="mb-2">{this.renderSeats(showTime, i)}</Space>);
+			result.push(
+				<Space key={'seat' + showTime.id + i} className="mb-2">
+					{this.renderSeats(showTime, i)}
+				</Space>
+			);
 		}
 
 		return result;
@@ -128,7 +155,7 @@ export default class BuyTicket extends Component {
 			});
 
 			result.push(
-				<Tooltip placement="top" title={(bookedSeat && 'Đã đặt') || (selectedSeat && 'Đã chọn')} arrowPointAtCenter>
+				<Tooltip key={showTime.id + i + j} placement="top" title={(bookedSeat && 'Đã đặt') || (selectedSeat && 'Đã chọn')} arrowPointAtCenter>
 					<Button disabled={bookedSeat} className="seat" type={selectedSeat && 'primary'} onClick={() => this.onSelectSeat(seat)}>
 						{seat}
 					</Button>
@@ -144,22 +171,16 @@ export default class BuyTicket extends Component {
 		if (!isAuthenticated) {
 			return <Redirect to={'/login'} />;
 		}
-		
-		const { loading, data, selectedMovieId, selectedBranchId, selectedShowTimeId, selectedSeats, isRedirect } = this.state;
+
+		const { loading, date, data, selectedMovieId, selectedBranchId, selectedShowTimeId, selectedSeats, isRedirect, movies, branches } = this.state;
 		if (isRedirect) {
 			return <Redirect to="/booking-histories" />;
 		}
 
-		const movies = [...new Map(data.map((item) => item.movie).map((item) => [item.id, item])).values()];
-		const branches = [
-			...new Map(
-				data
-					.filter((item) => item.movie.id === selectedMovieId)
-					.map((item) => item.cinema.branch)
-					.map((item) => [item.id, item])
-			).values(),
-		];
-		const showTimes = data.filter((item) => item.movie.id === selectedMovieId && item.cinema.branch.id === selectedBranchId);
+		const filterData = data.filter((item) => date.isSame(moment(item.startAt).format('YYYY-MM-DD'), 'day') && item.movie.id === selectedMovieId);
+
+		const availableBranches = [...new Map(filterData.map((item) => item.cinema.branch).map((item) => [item.id, item])).values()];
+		const showTimes = filterData.filter((item) => item.cinema.branch.id === selectedBranchId);
 		const showTime = showTimes.find((item) => item.id === selectedShowTimeId);
 
 		return (
@@ -174,41 +195,45 @@ export default class BuyTicket extends Component {
 										<dd class="txt_add"></dd>
 										<dt class="date_picker">
 											<Space direction="vertical">
-												<DatePicker disabledDate={(d) => !d || d.isBefore(moment().add(-1, 'd'))} allowClear={false} defaultValue={this.state.date} onChange={this.onChangeDate} />
+												<DatePicker disabledDate={(d) => !d || d.isBefore(moment().add(-1, 'd'))} allowClear={false} value={this.state.date} onChange={this.onChangeDate} />
 											</Space>
 										</dt>
 									</dl>
 
 									<div class="theater_cont">
-										<span className="ml-4 mb-3" style={{ 'font-weight': 'bold', 'font-size': '16px' }}>
+										<span className="ml-4 mb-3" style={{ fontWeight: 'bold', fontSize: '16px' }}>
 											Phòng chiếu:
 										</span>
 										<div className="m-4">
 											{selectedMovieId && (
 												<Radio.Group value={selectedBranchId} onChange={this.onChangeBranch}>
 													<Space size={[20, 10]} wrap>
-														{branches.map((branch) => (
-															<Radio.Button ghost key={branch.id} value={branch.id} className="text-center" style={{ width: '130px', height: '40px', 'font-size': '12px' }}>
-																<p className="mt-1">{branch.name}</p>
-															</Radio.Button>
-														))}
+														{branches.map((branch) => {
+															const isDisabled = availableBranches.findIndex((item) => item.id === branch.id) === -1;
+															return (
+																<Tooltip key={branch.id} placement="top" title={isDisabled && 'Không có suất chiếu nào'} arrowPointAtCenter>
+																	<Radio.Button ghost value={branch.id} className="text-center" disabled={isDisabled} style={{ width: '130px', height: '40px', fontSize: '12px' }}>
+																		<p className="mt-1">{branch.name}</p>
+																	</Radio.Button>
+																</Tooltip>
+															);
+														})}
 													</Space>
 												</Radio.Group>
 											)}
-											{!selectedMovieId && <Empty description="Vui lòng chọn phim" />}
 										</div>
 									</div>
 
 									{selectedBranchId && (
 										<>
-											<span className="ml-4 mb-3" style={{ 'font-weight': 'bold', 'font-size': '16px' }}>
+											<span className="ml-4 mb-3" style={{ fontWeight: 'bold', fontSize: '16px' }}>
 												Giờ chiếu:
 											</span>
 											<div className="m-4">
 												<Radio.Group value={selectedShowTimeId} onChange={this.onChangeShowTime}>
 													<Space>
 														{showTimes.map((showTime) => (
-															<Radio.Button key={showTime.id} value={showTime.id} className="text-center" style={{ height: 'auto', 'line-height': 16 }}>
+															<Radio.Button key={'showtime_' + showTime.id} value={showTime.id} className="text-center" style={{ height: 'auto', 'line-height': 16 }}>
 																<small>{showTime.cinema.name}</small>
 																<br />
 																<h5 className="font-weight-bold m-0">{moment(showTime.startAt).format('HH:mm')}</h5>
@@ -223,7 +248,7 @@ export default class BuyTicket extends Component {
 										</>
 									)}
 								</div>
-								<div class="ticket_right" style={{ 'max-height': '400px' }}>
+								<div class="ticket_right" style={{ maxHeight: '400px' }}>
 									<dl class="theater_header">
 										<dt class="Lang-LBL0011">Phim</dt>
 									</dl>
@@ -234,14 +259,14 @@ export default class BuyTicket extends Component {
 													{movies.map((movie) => (
 														<Radio key={movie.id} value={movie.id} className="ml-3" style={{ border: 'none' }}>
 															<div>
-																<span class="grade_13">18</span>
+																{movie.age >= 18 ? <span class="grade_18">18</span> : <span class="grade_13">13</span>}
 																<em>{movie.name.toUpperCase()}</em>
 															</div>
 														</Radio>
 													))}
 												</Space>
 											</Radio.Group>
-											{!loading && movies.length === 0 && <Empty description="Hiện không còn phim nào chiếu trong ngày bạn chọn" />}
+											{!loading && movies.length === 0 && <Empty description="Hiện không có phim nào sắp chiếu" />}
 										</div>
 									</div>
 								</div>
@@ -250,7 +275,7 @@ export default class BuyTicket extends Component {
 						{selectedShowTimeId && (
 							<>
 								<div style={{ background: 'white' }} className="pb-3">
-									<span className="ml-4 mb-3" style={{ 'font-weight': 'bold', 'font-size': '16px' }}>
+									<span className="ml-4 mb-3" style={{ fontWeight: 'bold', fontSize: '16px' }}>
 										Ghế ngồi:
 									</span>
 									<div className="mx-4 mt-4 mb-1">

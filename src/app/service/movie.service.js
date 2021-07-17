@@ -1,13 +1,12 @@
 import { environment } from '../../environments/environment';
-import { SortMovieType } from '../constants/movie.const';
 import service from '.';
 
 const BASE_URL = environment.BaseURL + '/api/movies';
 
-export function getPagingListMovie(page = 1, size = 10, sort = SortMovieType.Name) {
+export function getPagingListMovie(page, size, sort, showTimeFrom) {
 	return service(BASE_URL, {
 		method: 'GET',
-		params: { page, size, sort },
+		params: { page, size, sort, showTimeFrom },
 	});
 }
 

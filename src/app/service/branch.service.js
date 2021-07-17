@@ -9,6 +9,13 @@ export function get() {
 	});
 }
 
+export function getOne(id) {
+	return service(BASE_URL, {
+		url: '/' + id,
+		method: 'GET',
+	});
+}
+
 export function createBranch(payload) {
 	return service(BASE_URL, {
 		method: 'POST',

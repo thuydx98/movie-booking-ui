@@ -31,8 +31,8 @@ export default class AddShowTimeModal extends Component {
 			const payload = {
 				cinemaId: showTime.cinemaId,
 				movieId: showTime.movieId,
-				startAt: moment(showTime.times[0]).format('YYYY-MM-DD HH:mm'),
-				endAt: moment(showTime.times[1]).format('YYYY-MM-DD HH:mm'),
+				startAt: moment(showTime.times[0]).format('YYYY-MM-DDTHH:mm:ssZ'),
+				endAt: moment(showTime.times[1]).format('YYYY-MM-DDTHH:mm:ssZ'),
 			};
 			showTimeService
 				.createShowTime(payload)

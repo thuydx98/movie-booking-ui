@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import './css/login.sass';
 import { message as toastr } from 'antd';
-import { checkCode } from '../../service/auth.service';
+import * as authService from '../../service/auth.service';
 
 export default class CodeVerification extends Component {
 	constructor(props) {
@@ -13,6 +13,7 @@ export default class CodeVerification extends Component {
 			gmail: '',
 			type: null,
 			redirectToReferrer: false,
+			isValidFPCode: false,
 		};
 		this.submit = this.submit.bind(this);
 		this.onChange = this.onChange.bind(this);
@@ -21,7 +22,7 @@ export default class CodeVerification extends Component {
 	componentDidMount() {
 		let gmail = sessionStorage.getItem('gmail');
 		if (gmail) {
-			this.setState({ gmail: gmail });
+			this.setState({ gmail });
 		}
 
 		let type = sessionStorage.getItem('type'); // forgetpassword || registeraccount
@@ -32,20 +33,49 @@ export default class CodeVerification extends Component {
 
 	submit() {
 		if (this.state.usercode) {
-			var model = {
-				email: this.state.usercode,
-				code: this.state.gmail,
+			var params = {
+				email: this.state.gmail,
+				code: +this.state.usercode,
+				password: this.state.password,
 			};
 
-			checkCode(model)
-				.then((res) => {
-					toastr.success('Đăng ký thành công.');
-					this.setState({ redirectToReferrer: true });
-				})
-				.catch((error) => {
-					console.log(error);
-					toastr.success('Đăng ký thất bại.');
-				});
+			if (this.state.isValidFPCode && this.state.password !== this.state.password2) {
+				toastr.error('Mật khấu mới không trùng nhau');
+				return;
+			}
+
+			if (sessionStorage.getItem('type') === 'registeraccount') {
+				authService
+					.verifyNewAccount(params)
+					.then(() => {
+						toastr.success('Đăng ký thành công. Vui lòng đăng nhập để đặt vé ngay.');
+						this.setState({ redirectToReferrer: true });
+					})
+					.catch(() => {
+						toastr.error('Mã xác thực không đúng. Vui lòng thử lại.');
+					});
+			} else {
+				if (this.state.isValidFPCode) {
+					authService
+						.changePassword(params)
+						.then(() => {
+							toastr.success('Đổi mật khẩu thành công. Vui lòng đăng nhập để đặt vé ngay.');
+							this.setState({ redirectToReferrer: true });
+						})
+						.catch(() => {
+							toastr.error('Lỗi hệ thống. Vui lòng thử lại.');
+						});
+				} else {
+					authService
+						.checkForgotPasswordCode(params)
+						.then(() => {
+							this.setState({ isValidFPCode: true });
+						})
+						.catch(() => {
+							toastr.error('Mã xác thực không đúng. Vui lòng thử lại.');
+						});
+				}
+			}
 		}
 	}
 
@@ -73,16 +103,33 @@ export default class CodeVerification extends Component {
 											<div class="clear_fix">
 												<div class="login_left">
 													<ul class="etc_list">
-														<li class="Lang-LBL5021">Vui lòng nhập mã code để trở thành viên của Lotte Cinema.</li>
+														<li class="Lang-LBL5021">Vui lòng nhập thông tin để trở thành viên của Lotte Cinema.</li>
 														<li class="Lang-LBL5021">Với gmail: {this.state.gmail}</li>
 													</ul>
 													<div class="login_box">
-														<span>
-															<label for="userId" class="Lang-LBL0121">
-																Mã code:
-															</label>
-															<input onChange={this.onChange} type="text" id="userId" name="usercode" maxlength="50" placeholder="Nhập mã code" />
-														</span>
+														{this.state.isValidFPCode ? (
+															<>
+																<span>
+																	<label for="userPassword" class="Lang-LBL0085">
+																		Mật khẩu mới
+																	</label>
+																	<input onChange={this.onChange} type="password" id="userPassword" name="password" maxlength="20" placeholder="Nhập mật khẩu" />
+																</span>
+																<span>
+																	<label for="userPassword2" class="Lang-LBL0085">
+																		Nhập lại mật khẩu mới
+																	</label>
+																	<input onChange={this.onChange} type="password" id="userPassword2" name="password2" maxlength="20" placeholder="Nhập lại mật khẩu" />
+																</span>
+															</>
+														) : (
+															<span>
+																<label for="userId" class="Lang-LBL0121">
+																	Mã xác thực:
+																</label>
+																<input onChange={this.onChange} type="text" id="userId" name="usercode" maxlength="50" placeholder="Nhập mã code" />
+															</span>
+														)}
 													</div>
 													<div class="login_find">
 														<span>

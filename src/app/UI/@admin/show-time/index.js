@@ -52,17 +52,19 @@ export default class ShowTime extends Component {
 	}
 
 	onDateRangeChange(data) {
-		this.setState({ selectedStartTime: data[0], selectedEndTime: data[1] });
+		const selectedStartTime = data[0].startOf('day');
+		const selectedEndTime = data[1].endOf('day');
+		this.setState({ selectedStartTime , selectedEndTime });
 		const { selectedCinemaId } = this.state;
-		this.onQueryData(selectedCinemaId, data[0], data[1]);
+		this.onQueryData(selectedCinemaId, selectedStartTime, selectedEndTime);
 	}
 
 	onQueryData(cinemaId, startTime, endTime) {
 		if (cinemaId && startTime && endTime) {
 			const params = {
 				cinemaId,
-				startTime: moment(startTime).format('YYYY-MM-DD'),
-				endTime: moment(endTime).format('YYYY-MM-DD'),
+				startTime: moment(startTime).format('YYYY-MM-DDTHH:mm:ssZ'),
+				endTime: moment(endTime).format('YYYY-MM-DDTHH:mm:ssZ'),
 			};
 			this.setState({ showTimes: [], loading: true });
 			showTimeService.get(params).then((showTimes) => {
