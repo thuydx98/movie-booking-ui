@@ -15,7 +15,7 @@ export default class HomeFilm extends Component {
 	}
 
 	componentDidMount() {
-		const now = moment().format('YYYY-MM-DDTHH:mm:ss');
+		const now = moment().utc().format('YYYY-MM-DDTHH:mm:ss');
 		getPagingListMovie(1, 100, SortMovieType.Newest, now).then((data) => {
 			this.setState({
 				newestMovies: data?.items || [],

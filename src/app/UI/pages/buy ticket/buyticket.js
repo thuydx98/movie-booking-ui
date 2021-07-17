@@ -38,7 +38,7 @@ export default class BuyTicket extends Component {
 		const queries = qs.parse(this.props.location.search, { ignoreQueryPrefix: true });
 		const { movieId, showTimeId } = queries;
 
-		const now = moment().format('YYYY-MM-DDTHH:mm:ss');
+		const now = moment().utc().format('YYYY-MM-DDTHH:mm:ss');
 		const params = { startTime: now };
 
 		this.setState({ data: [], loading: true });

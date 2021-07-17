@@ -46,7 +46,7 @@ export default class Cinema extends Component {
 				onDelete: () => this.onDeleteCinema(cinema.id),
 			})),
 		}));
-		this.setState({ items});
+		this.setState({ items });
 	}
 
 	onDeleteBranch(branchId) {
@@ -96,7 +96,6 @@ export default class Cinema extends Component {
 							toastr.success('Xóa phòng chiếu thành công');
 						})
 						.catch((err) => {
-							console.log(err)
 							reject();
 							toastr.error('Xóa phòng chiếu thất bại');
 						});
@@ -111,7 +110,9 @@ export default class Cinema extends Component {
 
 	onCloseModal(movie) {
 		if (movie.id) {
-			this.setState({ items: [movie, ...this.state.items] });
+			const data = [movie, ...this.state.data];
+			this.setState({ data });
+			this.onMapData();
 		}
 
 		this.setState({ modalVisible: false });
